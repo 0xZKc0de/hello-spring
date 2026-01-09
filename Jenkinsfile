@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_REPO = 'haddad2003/hello-spring'
+        // تأكد من وضع اسم المستخدم الصحيح هنا
+        DOCKERHUB_REPO = 'VOTRE-USERNAME/hello-spring'
         CONTAINER_NAME = 'hello-app'
     }
 
@@ -10,7 +11,9 @@ pipeline {
         stage('Build JAR') {
             steps {
                 echo '🔨Compilation de l application...'
-                sh 'mvn clean package'
+                // تم تغيير sh إلى bat
+                // وتم استخدام mvnw.cmd الخاص بويندوز بدلاً من mvn فقط
+                bat 'mvnw.cmd clean package -DskipTests'
             }
         }
 
@@ -29,11 +32,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '🚀Déploiement de l application...'
-                sh """
-                    docker stop ${CONTAINER_NAME} || true
-                    docker rm ${CONTAINER_NAME} || true
+                // تم تغيير sh إلى bat
+                bat """
+                    docker stop ${CONTAINER_NAME} || exit 0
+                    docker rm ${CONTAINER_NAME} || exit 0
                     docker pull ${DOCKERHUB_REPO}:latest
-                    docker run -d --name ${CONTAINER_NAME} -p 8081:8081 ${DOCKERHUB_REPO}:latest
+                    docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${DOCKERHUB_REPO}:latest
                 """
             }
         }
